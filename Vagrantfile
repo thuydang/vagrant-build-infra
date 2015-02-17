@@ -2,8 +2,11 @@
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-
-  config.vm.provision "shell", path: "puppet/scripts/bootstrap.sh"
+# NOTE: vagrant-libvirt needs to run in series (not in parallel) to avoid
+# # trying to create the network twice... eg: vagrant up --no-parallel
+# # alternatively, you can just create the vm's one at a time manually...
+#  
+  config.vm.provision "shell", path: "puppet/scripts/bootstrap_centos.sh"
 
   num_compute_nodes = (ENV['DEVSTACK_NUM_COMPUTE_NODES'] || 1).to_i
 
@@ -50,7 +53,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		end
 		control.vm.provider :libvirt do |libvirt|
 			libvirt.driver = 'kvm'	# needed for kvm performance benefits !
-			libvirt.memory = 3024
+			libvirt.memory = 4024
 			# leave out to connect directly with qemu:///system
 			#libvirt.host = 'localhost'
 			libvirt.connect_via_ssh = false

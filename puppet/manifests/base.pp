@@ -3,12 +3,12 @@ $deps = [
     'automake',
     'bc',
     'bridge-utils',
-    'build-essential',
-    'conntrack',
+#    'build-essential',
+#    'conntrack',
     'curl',
-    'debhelper',
-    'dkms',
-    'dnsmasq-base',
+#    'debhelper',
+#    'dkms',
+#    'dnsmasq-base',
     'dnsmasq-utils',
     'ebtables',
     'euca2ools',
@@ -18,66 +18,66 @@ $deps = [
     'git',
     'graphviz',
     'iptables',
-    'iputils-arping',
-    'iputils-ping',
+#    'iputils-arping',
+#    'iputils-ping',
     'kpartx',
-    'libffi-dev',
-    'libjs-jquery-tablesorter',
-    'libssl-dev',
+#    'libffi-dev',
+#    'libjs-jquery-tablesorter',
+#    'libssl-dev',
     'libtool',
-    'libyaml-dev',
+#    'libyaml-dev',
     'lsof',
     'lvm2',
-    'open-iscsi',
+#    'open-iscsi',
     'openssh-server',
     'openssl',
     'parted',
     'pm-utils',
     'psmisc',
-    'pylint',
-    'python-all',
+#    'pylint',
+#    'python-all',
     'python-boto',
     'python-cheetah',
-    'python-dev',
-    'python-eventlet',
-    'python-feedparser',
-    'python-greenlet',
-    'python-iso8601',
-    'python-kombu',
-    'python-libxml2',
-    'python-lockfile',
+#    'python-dev',
+#    'python-eventlet',
+#    'python-feedparser',
+#    'python-greenlet',
+#    'python-iso8601',
+#    'python-kombu',
+#    'python-libxml2',
+#    'python-lockfile',
     'python-lxml',
-    'python-m2crypto',
-    'python-migrate',
-    'python-mox',
-    'python-mysql.connector',
-    'python-mysqldb',
-    'python-numpy',
+#    'python-m2crypto',
+#    'python-migrate',
+#    'python-mox',
+#    'python-mysql.connector',
+#    'python-mysqldb',
+#    'python-numpy',
     'python-paste',
-    'python-pastedeploy',
+#    'python-pastedeploy',
     'python-pyudev',
-    'python-qt4',
-    'python-routes',
+#    'python-qt4',
+#    'python-routes',
     'python-setuptools',
-    'python-sqlalchemy',
+#    'python-sqlalchemy',
     'python-suds',
     'python-tempita',
-    'python-twisted-conch',
-    'python-unittest2',
+#    'python-twisted-conch',
+#    'python-unittest2',
     'python-virtualenv',
-    'python-xattr',
-    'python-zopeinterface',
-    'python2.7',
+#    'python-xattr',
+#    'python-zopeinterface',
+    'python',
     'screen',
-    'sg3-utils',
+#    'sg3-utils',
     'socat',
-    'sqlite3',
+#    'sqlite3',
     'sudo',
     'sysfsutils',
     'tar',
     'tcpdump',
     'unzip',
-    'vlan',
+#    'vlan',
     'wget'
 ]
 
@@ -95,6 +95,22 @@ file { '/etc/hosts':
 package { $deps:
     ensure   => installed,
 }
+
+# Remove unused packages
+#$pack_remove = [ "NetworkManager", "firewalld","ModemManager-gliqb", "teamd","xfsprogs","wpa_supplicant", "alsa-lib"]
+
+#package { $pack_remove:
+#		ensure => "absent",
+#}
+
+# disable firewalld
+if $::osfamily == 'RedHat' and $::operatingsystemmajversion == 7 { 
+    package { 'iptables-services':
+      ensure => present,
+    }   
+#Package['iptables-services'] -> Firewall<||>
+}
+
 
 exec {"Download Open vSwitch":
     command => "wget http://openvswitch.org/releases/openvswitch-${ovs_version}.tar.gz",
@@ -114,40 +130,40 @@ exec { 'Extract Open vSwitch':
     require => Exec['Download Open vSwitch']
 }
 
-exec { 'Compile Open vSwitch':
-    command => 'fakeroot debian/rules binary',
-    cwd     => "/home/vagrant/openvswitch-${ovs_version}",
-    creates => "/home/vagrant/openvswitch-common_${ovs_version}-1_amd64.deb",
-    user    => 'root',
-    path    => $::path,
-    timeout => 0,
-    require => [Exec['Extract Open vSwitch'], Package[$deps]]
-}
-
-package { 'openvswitch-common':
-    ensure   => installed,
-    provider => dpkg,
-    source   => "/home/vagrant/openvswitch-common_${ovs_version}-1_amd64.deb",
-    require  => Exec['Compile Open vSwitch']
-}
-
-package { 'openvswitch-switch':
-    ensure   => installed,
-    provider => dpkg,
-    source   => "/home/vagrant/openvswitch-switch_${ovs_version}-1_amd64.deb",
-    require  => Package['openvswitch-common']
-}
-
-package { 'openvswitch-datapath-dkms':
-    ensure   => installed,
-    provider => dpkg,
-    source   => "/home/vagrant/openvswitch-datapath-dkms_${ovs_version}-1_all.deb",
-    require  => Package['openvswitch-switch']
-}
-
-package { 'openvswitch-pki':
-    ensure   => installed,
-    provider => dpkg,
-    source   => "/home/vagrant/openvswitch-pki_${ovs_version}-1_all.deb",
-    require  => Package['openvswitch-datapath-dkms']
-}
+#exec { 'Compile Open vSwitch':
+#    command => 'fakeroot debian/rules binary',
+#    cwd     => "/home/vagrant/openvswitch-${ovs_version}",
+#    creates => "/home/vagrant/openvswitch-common_${ovs_version}-1_amd64.deb",
+#    user    => 'root',
+#    path    => $::path,
+#    timeout => 0,
+#    require => [Exec['Extract Open vSwitch'], Package[$deps]]
+#}
+#
+#package { 'openvswitch-common':
+#    ensure   => installed,
+#    provider => dpkg,
+#    source   => "/home/vagrant/openvswitch-common_${ovs_version}-1_amd64.deb",
+#    require  => Exec['Compile Open vSwitch']
+#}
+#
+#package { 'openvswitch-switch':
+#    ensure   => installed,
+#    provider => dpkg,
+#    source   => "/home/vagrant/openvswitch-switch_${ovs_version}-1_amd64.deb",
+#    require  => Package['openvswitch-common']
+#}
+#
+#package { 'openvswitch-datapath-dkms':
+#    ensure   => installed,
+#    provider => dpkg,
+#    source   => "/home/vagrant/openvswitch-datapath-dkms_${ovs_version}-1_all.deb",
+#    require  => Package['openvswitch-switch']
+#}
+#
+#package { 'openvswitch-pki':
+#    ensure   => installed,
+#    provider => dpkg,
+#    source   => "/home/vagrant/openvswitch-pki_${ovs_version}-1_all.deb",
+#    require  => Package['openvswitch-datapath-dkms']
+#}
