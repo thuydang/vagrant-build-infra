@@ -6,7 +6,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 # # trying to create the network twice... eg: vagrant up --no-parallel
 # # alternatively, you can just create the vm's one at a time manually...
 #  
-  config.vm.provision "shell", path: "puppet/scripts/bootstrap_centos.sh"
+  config.vm.provision "shell", path: "puppet/scripts/bootstrap.sh"
 
   num_compute_nodes = (ENV['DEVSTACK_NUM_COMPUTE_NODES'] || 1).to_i
 
@@ -27,9 +27,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Devstack Controller
   config.vm.define "devstack-control", primary: true do |control|
-#control.vm.box = "trusty64"
-#control.vm.box_url = "http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-14.04_chef-provisionerless.box"
-		control.vm.box = "centos-7.0"
+		control.vm.box = "trusty64"
+		control.vm.box_url = "http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-14.04_chef-provisionerless.box"
+#control.vm.box = "centos-7.0"
 #control.vm.box_url = "http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_centos-7.0_chef-provisionerless.box"
     control.vm.provider "vmware_fusion" do |v, override|
 			override.vm.box = 'trusty64'
@@ -75,9 +75,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.define "devstack-compute-#{n+1}", autostart: true do |compute|
       compute_ip = compute_ips[n]
       compute_index = n+1
-			#compute.vm.box = "trusty64"
-			#compute.vm.box_url = "http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-14.04_chef-provisionerless.box"
-			compute.vm.box = "centos-7.0"
+			compute.vm.box = "trusty64"
+			compute.vm.box_url = "http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-14.04_chef-provisionerless.box"
+#compute.vm.box = "centos-7.0"
       compute.vm.provider "vmware_fusion" do |v, override|
       	override.vm.box_url = "http://opscode-vm-bento.s3.amazonaws.com/vagrant/vmware/opscode_centos-7.0_chef-provisionerless.box"
       end
@@ -85,7 +85,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       compute.vm.network "private_network", ip: "#{compute_ip}"
       ## compute.vm.network "private_network", type: "dhcp", virtualbox__intnet: "intnet"
       compute.vm.provider :virtualbox do |vb, override|
-      	override.vm.box_url = "http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_centos-7.0_chef-provisionerless.box"
+#override.vm.box_url = "http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_centos-7.0_chef-provisionerless.box"
         vb.memory = 4096
       end
       compute.vm.provider "vmware_fusion" do |vf|
