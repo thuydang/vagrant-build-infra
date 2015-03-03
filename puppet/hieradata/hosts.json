@@ -2,23 +2,32 @@
   "hosts": {
     "opendaylight": {
       "name": "opendaylight",
-      "ipaddress": "192.168.50.1"
+      "ipaddress": "192.168.50.10"
     },
-    "devstack-control": {
-      "name": "devstack-control",
-      "ipaddress": "192.168.50.20"
+    "openstack-control": {
+      "name": "openstack-control",
+      "ipaddress": "192.168.50.20",
+      "ipaddress": "10.10.10.20"
     },
-    "devstack-compute-1": {
-      "name": "devstack-compute-1",
-      "ipaddress": "192.168.50.21"
+		"openstack-network": {
+      "name": "openstack-network",
+      "ipaddress": "192.168.50.19",
+      "ipaddress": "10.10.10.19"
     },
-    "devstack-compute-2": {
-      "name": "devstack-compute-2",
-      "ipaddress": "192.168.50.22"
+    "openstack-compute-1": {
+      "name": "openstack-compute-1",
+      "ipaddress": "192.168.50.21",
+      "ipaddress": "10.10.10.21"
     },
-    "devstack-compute-3": {
-      "name": "devstack-compute-3",
-      "ipaddress": "192.168.50.23"
+    "openstack-compute-2": {
+      "name": "openstack-compute-2",
+      "ipaddress": "192.168.50.22",
+      "ipaddress": "10.10.10.22"
+    },
+    "openstack-compute-3": {
+      "name": "openstack-compute-3",
+      "ipaddress": "192.168.50.23",
+      "ipaddress": "10.10.10.23"
     }
   }
 }
