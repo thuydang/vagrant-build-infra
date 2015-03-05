@@ -78,7 +78,8 @@ $deps = [
     'tcpdump',
     'unzip',
     'vlan',
-    'wget'
+    'wget',
+		'vim'
 ]
 
 $hosts = hiera('hosts')
