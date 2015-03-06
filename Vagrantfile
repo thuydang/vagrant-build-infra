@@ -56,10 +56,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	config.vm.synced_folder "/mnt/nfv/vagrant/vagrant_common_nfs/ubuntu32_ima_build", "/vagrant_nfs", type: "nfs"
 
   # Devstack Controller
-  config.vm.define "ubuntu32_ima_build", primary: true do |control|
-		control.vm.box = "trusty32"
+  config.vm.define "debian-7.8-i386-ima_build", primary: true do |control|
+		control.vm.box = "debian-7.8-i386"
 #		control.vm.box_url = "http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-14.04_chef-provisionerless.box"
-    control.vm.hostname = "trusty32-dev"
+    control.vm.hostname = "debian-7.8-i386-dev"
     control.vm.network "private_network", ip: "#{control_ip}"
     ## control.vm.network "forwarded_port", guest: 8080, host: 8081
     ## control.vm.network "private_network", type: "dhcp", virtualbox__intnet: "intnet"
