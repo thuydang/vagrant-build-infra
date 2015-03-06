@@ -53,23 +53,21 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 	
 	# NFS Sync
-  config.vm.synced_folder "/mnt/extdata/vagrant_nfs", "/vagrant_nfs", type: "nfs"
+	config.vm.synced_folder "/mnt/nfv/vagrant/vagrant_common_nfs/ubuntu32_ima_build", "/vagrant_nfs", type: "nfs"
 
   # Devstack Controller
-  config.vm.define "devstack-control", primary: true do |control|
-		control.vm.box = "trusty64"
-		control.vm.box_url = "http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-14.04_chef-provisionerless.box"
-#control.vm.box = "centos-7.0"
-#control.vm.box_url = "http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_centos-7.0_chef-provisionerless.box"
-    control.vm.provider "vmware_fusion" do |v, override|
-			override.vm.box = 'trusty64'
-      override.vm.box_url = "http://opscode-vm-bento.s3.amazonaws.com/vagrant/vmware/opscode_ubuntu-14.04_chef-provisionerless.box"
-    end
-    control.vm.hostname = "devstack-control"
+  config.vm.define "ubuntu32_ima_build", primary: true do |control|
+		control.vm.box = "trusty32"
+#		control.vm.box_url = "http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-14.04_chef-provisionerless.box"
+    control.vm.hostname = "trusty32-dev"
     control.vm.network "private_network", ip: "#{control_ip}"
     ## control.vm.network "forwarded_port", guest: 8080, host: 8081
     ## control.vm.network "private_network", type: "dhcp", virtualbox__intnet: "intnet"
     ## neutron.vm.network "private_network", ip: "#{neutron_ex_ip}", virtualbox__intnet: "mylocalnet"
+    control.vm.provider "vmware_fusion" do |v, override|
+#			override.vm.box = 'trusty64'
+#      override.vm.box_url = "http://opscode-vm-bento.s3.amazonaws.com/vagrant/vmware/opscode_ubuntu-14.04_chef-provisionerless.box"
+    end
     control.vm.provider :virtualbox do |vb|
       vb.memory = 4096
     end
@@ -83,7 +81,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		end
 		control.vm.provider :libvirt do |libvirt|
 			libvirt.driver = 'kvm'	# needed for kvm performance benefits !
-			libvirt.memory = 4024
+			libvirt.memory = 3024
 			# leave out to connect directly with qemu:///system
 			#libvirt.host = 'localhost'
 			libvirt.connect_via_ssh = false
@@ -96,96 +94,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       puppet.hiera_config_path = "puppet/hiera.yaml"
       puppet.working_directory = "/vagrant/puppet"
       puppet.manifests_path = "puppet/manifests"
-      puppet.manifest_file  = "devstack-control.pp"
-    end
-  end
-
-  # Devstack Compute Nodes
-  num_compute_nodes.times do |n|
-  # Disable autostart. Start manually with 'vagrant up devstack-compute-#'
-    #config.vm.define "devstack-compute-#{n+1}", autostart: true do |compute|
-    config.vm.define "devstack-compute-#{n+1}", autostart: false do |compute|
-      compute_ip = compute_ips[n]
-      compute_index = n+1
-			compute.vm.box = "trusty64"
-			compute.vm.box_url = "http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-14.04_chef-provisionerless.box"
-#compute.vm.box = "centos-7.0"
-      compute.vm.provider "vmware_fusion" do |v, override|
-      	override.vm.box_url = "http://opscode-vm-bento.s3.amazonaws.com/vagrant/vmware/opscode_centos-7.0_chef-provisionerless.box"
-      end
-      compute.vm.hostname = "devstack-compute-#{compute_index}"
-      compute.vm.network "private_network", ip: "#{compute_ip}"
-      ## compute.vm.network "private_network", type: "dhcp", virtualbox__intnet: "intnet"
-      compute.vm.provider :virtualbox do |vb, override|
-#override.vm.box_url = "http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_centos-7.0_chef-provisionerless.box"
-        vb.memory = 4096
-      end
-      compute.vm.provider "vmware_fusion" do |vf|
-        vf.vmx["memsize"] = "4096"
-      end
-			compute.vm.provider :kvm do |kvm, override|
-				kvm.memory_size = '4096m'
-			end
-			compute.vm.provider :libvirt do |libvirt|
-				libvirt.driver = 'kvm'	# needed for kvm performance benefits !
-				libvirt.memory = 3024
-				# leave out to connect directly with qemu:///system
-				#libvirt.host = 'localhost'
-				libvirt.connect_via_ssh = false
-				libvirt.username = 'root'
-				libvirt.storage_pool_name = 'default'
-				#libvirt.default_network = 'default' # XXX: this does nothing
-				#libvirt.default_prefix = 'gluster'	# prefix for your vm's!
-			end
-      compute.vm.provision "puppet" do |puppet|
-        puppet.hiera_config_path = "puppet/hiera.yaml"
-        puppet.working_directory = "/vagrant/puppet"
-        puppet.manifests_path = "puppet/manifests"
-        puppet.manifest_file  = "devstack-compute.pp"
-      end
-    end
-  end
-
-	# ODL development node
-	config.vm.define "odl-dev", autostart: true do |dev|
-    dev_ip = odl_dev_ip
-		dev.vm.box = "trusty64"
-		dev.vm.box_url = "http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_ubuntu-14.04_chef-provisionerless.box"
-		dev.ssh.forward_x11 = true 
-		
-    dev.vm.hostname = "odl-dev"
-    dev.vm.network "private_network", ip: "#{odl_dev_ip}"
-    ## dev.vm.network "private_network", type: "dhcp", virtualbox__intnet: "intnet"
-    dev.vm.provider :virtualbox do |vb, override|
-#override.vm.box_url = "http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_centos-7.0_chef-provisionerless.box"
-      vb.memory = 4096
-    end
-    dev.vm.provider "vmware_fusion" do |v, override|
-    	override.vm.box_url = "http://opscode-vm-bento.s3.amazonaws.com/vagrant/vmware/opscode_centos-7.0_chef-provisionerless.box"
-    end
-    dev.vm.provider "vmware_fusion" do |vf|
-      vf.vmx["memsize"] = "4096"
-    end
-		dev.vm.provider :kvm do |kvm, override|
-			kvm.memory_size = '4096m'
-		end
-		dev.vm.provider :libvirt do |libvirt|
-			libvirt.driver = 'kvm'	# needed for kvm performance benefits !
-			libvirt.memory = 4096
-			# leave out to connect directly with qemu:///system
-			#libvirt.host = 'localhost'
-			libvirt.connect_via_ssh = false
-			libvirt.username = 'root'
-			libvirt.storage_pool_name = 'default'
-			#libvirt.default_network = 'default' # XXX: this does nothing
-			#libvirt.default_prefix = 'gluster'	# prefix for your vm's!
-		end
-    dev.vm.provision "puppet" do |puppet|
-      puppet.hiera_config_path = "puppet/hiera.yaml"
-      puppet.working_directory = "/vagrant/puppet"
-      puppet.manifests_path = "puppet/manifests"
-      puppet.module_path = "puppet/modules"
-      puppet.manifest_file  = "odl-dev.pp"
+      puppet.manifest_file  = "ubuntu32.pp"
     end
   end
 
